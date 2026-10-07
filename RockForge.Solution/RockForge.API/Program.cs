@@ -1,3 +1,4 @@
+using RockForge.API.ExceptionHandling;
 using RockForge.Application.RockService;
 using System.Text.Json.Serialization;
 
@@ -9,6 +10,10 @@ builder.Services.AddControllers()
                                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                                            });
 
+// - Centralized Exception Handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // - Swagger Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -17,6 +22,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IRockService, RockService>();
 
 var app = builder.Build();
+
+// - Centralized Exception Handling
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
