@@ -1,0 +1,240 @@
+Technical Assessment Doctorly VirginActive
+TechAssessVirginActive
+
+Authentication:
+===============
+- When running Swagger look for the [Authorize] button near the top
+- Click [Authorize] and specify 3f7b4a18-8d8b-4f0c-9d32-5d14b8e6c2a1 as the API-Key
+
+Nuget Packages Installed:
+=========================
+Swashbuckle.AspNetCore
+Microsoft.Extensions.Http.Resilience
+Microsoft.Extensions.Logging.Abstractions
+
+Scrum Tasks:
+============
+000-Create-GitRepository-VsSolution-AppArchitecture
+001-Rock-Management
+002-Input-Validation
+003-Category-Validation-Strategies
+004-Global-Error-Handling
+005-Structured-Logging-Correlation
+006-Api-Key-Authentication
+007-Profile-Integration-Resilience
+008-Tests
+009-Readme
+
+Scrum Task Cycle:
+=================
+main -> branch -> implement -> test -> commit(PR) -> merge into main -> pull main
+
+GIT:
+====
+Branch: 000-Create-GitRepository-VsSolution-AppArchitecture
+Commits: Repo created, Solution created
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/1
+
+Branch: 001-Rock-Management
+Commits: Working Basic Solution End-to-End
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/2
+
+Branch: 002-Input-Validation
+Commits: Validations Complete
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/3
+
+Branch: 003-Category-Validation-Strategies
+Commits: Category Validation Done
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/4
+
+Branch: 004-Global-Error-Handling
+Commits: Central Exception handling done with fail-safe 500
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/5
+
+Branch: 005-Structured-Logging-Correlation
+Commits: Structured Logging Correlation achieved
+         ReadMe File Updated with latest commit
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/6
+              https://github.com/CorneliusEybers/RockForge/pull/7
+
+Branch: 006-Api-Key-Authentication
+Commits: Straight into main. not allowed!! Burn!
+Pull Request:
+
+Branch: 007-Profile-Integration-Resilience
+Commits: Third Party Integration Completed
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/8
+
+Branch: 008-Tests
+Commits: Basic Unit Tests
+         Two scenarios per testable item...
+Pull Request: https://github.com/CorneliusEybers/RockForge/pull/9
+
+Branch:
+Commits:
+Pull Request:
+
+Notes and Decisions:
+====================
+Getting Started:
+----------------
+- My SOP to jump in that I follow every day in my work is the same as
+  what I share in this readme file. Every task on my board I do in
+  the way displayed in this readme.
+- I start every task in its own folder on my local 
+  all task folders are held together in the Workitems folder.
+- Every task starts with a text file like this called Investigate.txt
+- Before every task/story I do a small technical assessment to 
+  investigate technically what is already there and how does the new 
+  requirement fit into the existing system.
+- I also create a SQL file called Investigate.sql where I do the queries
+  to see how the data looks on the database before the changes
+
+Application Creation:
+---------------------
+- I chose the name for the application as RockForge.
+  It is a short easy name to for people to use and remember.
+  A place where commitments are forged, tested, and completed.
+- Create the Repository in GIT.
+- Visual Studio project RockForge.API inside solution RockForge
+  to be scalable we can later add multiple projects
+  as well as the Unit test project.
+- All projects created inside the Solution to facilitate the 
+  Application Architecture
+
+Application Architecture:
+-------------------------
+RockForge.API - Exposes the REST API endpoints and handles incoming HTTP requests/responses.
+RockForge.Application - Contains application use cases, business workflows, and service orchestration.
+RockForge.Domain - Contains the core business entities, enums, rules, and domain behaviour.
+RockForge.Infrastructure - Contains external integrations, in-memory persistence, and technical implementations.
+RockForge.Tests - Contains automated tests for critical business rules and application behaviour.
+
+Rock Management
+---------------
+- Get the application to work!!
+- Start at the endpoint, create the endpoint and then 
+  create all the components/methods in the subsequent layers.
+- Be careful to stick to the original Architecture decisions made.
+- For storage I used a Dictionary, to keep the dictionary 
+  alive for one run I scoped the service as Singleton in Program.cs
+- All Endpoints working, checked with test data as per attached.
+
+Input Validation:
+-----------------
+- I created one central validator that exists in the Application layer.
+- It throws excpetions for validation errors that bubbles up through 
+  the system and by using the excpetions to also cater for validation'
+  I set everythin up for Central Excpetion handling later
+- No separate message to the user for validation
+  Let it all run via the Exception syste,
+- API to return only the friendly error to the subscriber
+  while the technical(vulnerable) Error data remains internal.
+- Foundation laid for Centralised Exception Handling
+
+Category-Validation:
+--------------------
+- Each category to have its own validation strategy
+- Future category should require adding a new class 
+  and not modifying existing validation logic,
+- Implement Open/Closed Principle
+  ~ For a new RockCategory we will create a new strategy
+    with it's own interface.
+  ~ Register in Program.cs usinf the same Interface(IRockValidationStrategy)
+    because the controller request DI to inject using the interface
+    DI will inject all the services of that interface...
+  ~ New RockCategory will not cause any changes in any existing strategy
+    but will be contained in it own strategy
+  ~ open for extension, closed for modification.
+
+Global Error Handling:
+----------------------
+- Let all exceptions come through a central place.
+- No try-catches all over the show hiding system errors.
+- Standard exception handling and logging
+- The fallback 500 is the part that completes the requirement.
+  When something genuinely unexpected happens the client must not receive
+  stack trace, assembly names, method names, internal paths, SQL details
+  Instead they receive the standard problem detail
+  {
+  "title": "An unexpected error occurred",
+  "status": 500,
+  "detail": "An unexpected error occurred while processing the request.",
+  "instance": "/members/007CTE001/rocks",
+  "traceId": "..."
+  }
+  while the exception is written in the internal log for support developers to fix.
+- Final Changes to program.cs.
+  
+Structured Logging Correlation:
+-------------------------------
+- Five Logging Rules
+  ~ use incoming X-Correlation-Id(or generate one)
+    and include it in every log for that request.
+  ~ sensible log levels,
+  ~ emit structured JSON logs
+  ~ log every request outcome including status code and duration
+- I chose to use the built-in Microsoft.Extensions.Logging
+- Everything logged while that HTTP request is being processed 
+  inherits the CorrelationId.
+- Each controller, service, validation strategy and 
+  the global exception handler do not each have to 
+  manually pass the correlation ID around.
+- The Correlation Id can be given to Support engineers
+  and used find all logs belonging to that particular request.
+- Structured JSON logging
+  ~ Correlation ID per request
+  ~ Correlation ID returned to the caller
+  ~ Correlation ID available to every log entry in the request scope
+  ~ Status-code-aware log levels
+  ~ Request duration logging
+
+Api Key Authentication:
+-----------------------
+- Every endpoint must require X-Api-Key
+- Valid key come from configuration
+- missing or invalid keys return 401
+- NB NB! I had a solution for placing the API-Key in the secrets
+  BUT I removed that. I do not want the solution 
+  to look like it does not run...
+- API-Key placed in the appsetting.development.json file
+  "ApiKey": "3f7b4a18-8d8b-4f0c-9d32-5d14b8e6c2a1"
+- For assessment convenience, 
+  a local development API key is included in appsettings.Development.json so the 
+  service can be run immediately after cloning. 
+  In production, this secret would not be committed and would 
+  be stored in Azure Key Vault and accessed via managed identity.
+
+Profile Integration Resilience:
+-------------------------------
+- This is an unreliable external dependency.
+  Isolate it, bound how long to wait, retry transient failures, 
+  avoid retry storms, log attempts, and preserve partial functionality.
+- Endpoint that combines the member's Rocks with 
+  the member's profile data from an external/third-party API
+- if the third-party API fails
+  * require retries
+  * exponential backoff with jitter
+  * timeout handling
+  * retry logging
+  * graceful degradation NOT returning a 500 .
+- RockForge knows about Rocks.
+  RockForge does NOT own profile information.
+- When an enriched profile is required
+  Then Get Rocks from RockForge
+  Then Get profile from external service
+  Then Combine them
+  Then Return one response
+- Resilience: When JSONPlaceholder is down
+  * Without resilience external API fails -> RockForge throws exception -> 500 Internal Server Error
+    Because some other system is broken, our endpoint is broken.
+  * With Resilience -> GET enriched profile -> get Rocks successfully -> call external profile API
+                    -> external API fails -> retry a few times -> still fails -> return the Rocks anyway
+                    -> enrichmentAvailable = false
+- Retry
+  * Each retry records Attempt number, Delay Reason, Correlation ID
+- Jitter 
+  * Rather than hammering the failing service 
+    add small random variation to those delays.
+- Exponential backoff simply means we wait progressively longer between retries.
+- Graceful degradation: could not enrich the response, but I can still fulfil the useful part of the request.
