@@ -76,7 +76,10 @@ namespace RockForge.API.ExceptionHandling
                 Instance = httpContext.Request.Path
             };
 
-            problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
+            if (httpContext.Items.TryGetValue("CorrelationId", out var correlationId))
+            {
+                problemDetails.Extensions["correlationId"] = correlationId?.ToString();
+            }
 
             return problemDetails;
         }

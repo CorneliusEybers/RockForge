@@ -1,7 +1,8 @@
 using RockForge.API.ExceptionHandling;
+using RockForge.API.Middleware;
 using RockForge.Application.RockService;
-using System.Text.Json.Serialization;
 using RockForge.Application.Validation.Strategies;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,23 @@ builder.Services.AddSingleton<IRockValidationStrategy, OtherRockValidationStrate
 // - Service registrations
 builder.Services.AddSingleton<IRockService, RockService>();
 
+// - Structured Logging Correlation
+builder.Logging.ClearProviders();
+
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.UseUtcTimestamp = true;
+    options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+});
+
+
 // - Run the Application
 var app = builder.Build();
+
+// - Structured Logging Correlation
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // - Centralized Exception Handling
 app.UseExceptionHandler();
