@@ -1,3 +1,4 @@
+using Microsoft.OpenApi;
 using RockForge.API.ExceptionHandling;
 using RockForge.API.Middleware;
 using RockForge.Application.RockService;
@@ -18,7 +19,23 @@ builder.Services.AddProblemDetails();
 
 // - Swagger Services
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>{
+                                            const string apiKeyScheme = "ApiKey";
+
+                                            options.AddSecurityDefinition(apiKeyScheme, new OpenApiSecurityScheme
+                                            {
+                                                Description = "Enter the API key",
+                                                Type = SecuritySchemeType.ApiKey,
+                                                Name = "X-Api-Key",
+                                                In = ParameterLocation.Header
+                                            });
+
+                                            options.AddSecurityRequirement(document =>
+                                                new OpenApiSecurityRequirement
+                                                {
+                                                    [new OpenApiSecuritySchemeReference(apiKeyScheme, document)] = []
+                                                });
+                                         });
 
 // Category validation strategies
 builder.Services.AddSingleton<IRockValidationStrategy, RevenueRockValidationStrategy>();
@@ -50,6 +67,9 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 // - Centralized Exception Handling
 app.UseExceptionHandler();
 
+// - Api Key Authentication
+app.UseMiddleware<ApiKeyAuthenticationMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -58,9 +78,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
