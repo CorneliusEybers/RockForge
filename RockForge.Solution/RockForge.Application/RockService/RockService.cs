@@ -1,7 +1,9 @@
-﻿using RockForge.Application.Validation;
+﻿using System.Collections.Concurrent;
+using RockForge.Application.Validation;
+using RockForge.Application.Validation.Strategies;
 using RockForge.Domain;
 using RockForge.Domain.Enums;
-using System.Collections.Concurrent;
+
 
 namespace RockForge.Application.RockService
 {
@@ -9,12 +11,25 @@ namespace RockForge.Application.RockService
     {
         private readonly ConcurrentDictionary<Guid, Rock> _rocks = new();
 
+        private readonly IEnumerable<IRockValidationStrategy> _validationStrategies;
+
+        public RockService(IEnumerable<IRockValidationStrategy> validationStrategies)
+        {
+            _validationStrategies = validationStrategies;
+        }
+
         public Task<Rock> CreateAsync(Rock rock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Base validation
             RockValidator.ValidateForCreate(rock);
 
+            // Category-specific validation
+            var validationStrategy = _validationStrategies.Single(strategy => strategy.Category == rock.Category);
+            validationStrategy.Validate(rock);
+
+            // - Add the rock to the in-memory store
             _rocks.TryAdd(rock.Id, rock);
 
             return Task.FromResult(rock);
