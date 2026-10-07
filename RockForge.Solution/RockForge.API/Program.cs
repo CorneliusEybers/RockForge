@@ -4,6 +4,10 @@ using RockForge.API.Middleware;
 using RockForge.Application.RockService;
 using RockForge.Application.Validation.Strategies;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Http.Resilience;
+using Polly;
+using RockForge.Infrastructure.ProfileClient;
+using RockForge.Application.ProfileService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +49,7 @@ builder.Services.AddSingleton<IRockValidationStrategy, OtherRockValidationStrate
 
 // - Service registrations
 builder.Services.AddSingleton<IRockService, RockService>();
+builder.Services.AddTransient<IEnrichedProfileService, EnrichedProfileService>();
 
 // - Structured Logging Correlation
 builder.Logging.ClearProviders();
@@ -55,6 +60,47 @@ builder.Logging.AddJsonConsole(options =>
     options.UseUtcTimestamp = true;
     options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 });
+
+// - Profile Integration Resilience
+builder.Services.AddHttpClient<IProfileClient, JsonPlaceholderProfileClient>(client => {
+                                                                                           client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/");
+
+                                                                                           client.Timeout = TimeSpan.FromSeconds(10);
+                                                                                       })
+                .AddResilienceHandler(
+                    "ProfileClientResilience",
+                    (resilienceBuilder, context) =>
+                    {
+                        var loggerFactory =
+                            context.ServiceProvider
+                                   .GetRequiredService<ILoggerFactory>();
+
+                        var logger =
+                            loggerFactory.CreateLogger("ProfileClientRetry");
+
+                        resilienceBuilder.AddRetry(new HttpRetryStrategyOptions
+                        {
+                            MaxRetryAttempts = 3,
+                            Delay = TimeSpan.FromSeconds(1),
+                            BackoffType = DelayBackoffType.Exponential,
+                            UseJitter = true,
+                            OnRetry = args =>
+                            {
+                                logger.LogWarning(
+                                    "Retrying profile request. Attempt {AttemptNumber}, Delay {Delay}, Reason {Reason}",
+                                    args.AttemptNumber + 1,
+                                    args.RetryDelay,
+                                    args.Outcome.Exception?.Message
+                                        ?? args.Outcome.Result?.StatusCode.ToString()
+                                        ?? "Unknown");
+
+                                return ValueTask.CompletedTask;
+                            }
+                        });
+
+                        resilienceBuilder.AddTimeout(
+                            TimeSpan.FromSeconds(10));
+                    });
 
 
 // - Run the Application
