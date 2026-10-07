@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="RockForge.API/RockForge.API.csproj" />
+  <Project Path="RockForge.Application/RockForge.Application.csproj" />
+  <Project Path="RockForge.Domain/RockForge.Domain.csproj" />
+  <Project Path="RockForge.Infrastructure/RockForge.Infrastructure.csproj" />
+  <Project Path="RockForge.Tests/RockForge.Tests.csproj" />
+</Solution>
