@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RockForge.API.Models.Request;
+using RockForge.API.Models.Response;
+using RockForge.Application.ProfileService;
 using RockForge.Application.RockService;
 using RockForge.Domain;
 using RockForge.Domain.Enums;
+using RockForge.Infrastructure.ProfileClient;
 
 namespace RockForge.API.Controllers
 {
@@ -11,10 +14,13 @@ namespace RockForge.API.Controllers
     public sealed class RocksController : ControllerBase
     {
         private readonly IRockService _rockService;
+        private readonly IEnrichedProfileService _enrichedProfileService;
 
-        public RocksController(IRockService rockService)
+        public RocksController(IRockService rockService,
+                               IEnrichedProfileService enrichedProfileService)
         {
             _rockService = rockService;
+            _enrichedProfileService = enrichedProfileService;
         }
 
         [HttpPost]
@@ -72,6 +78,23 @@ namespace RockForge.API.Controllers
                                                             cancellationToken);
 
             return Ok(rock);
+        }
+
+        [HttpGet("/members/{memberId}/profile/enriched")]
+        [ProducesResponseType(typeof(EnrichedProfileResponse),StatusCodes.Status200OK)]
+        public async Task<ActionResult<EnrichedProfileResponse>> GetEnrichedProfile(string memberId, CancellationToken cancellationToken)
+        {
+            var result = await _enrichedProfileService.GetEnrichedProfileAsync(memberId, cancellationToken);
+
+            var response = new EnrichedProfileResponse
+            {
+                Profile = result.Profile,
+                Rocks = result.Rocks,
+                EnrichmentAvailable = result.EnrichmentAvailable
+            };
+
+            return Ok(response);
+
         }
     }
 }
