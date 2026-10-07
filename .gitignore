@@ -426,3 +426,16 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# RockForge local secrets and environment configuration
+.env
+.env.*
+!.env.example
+
+secrets.json
+
+# Local developer certificates
+*.pfx
+*.p12
+*.key
+*.crt
