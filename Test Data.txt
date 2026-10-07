@@ -148,3 +148,29 @@ rockId 3fa85f64-5717-4562-b3fc-2c963f66afa6
   "instance": "/members/007CTE001/rocks/3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "traceId": "0HNP4FOAD3IOC:00000013"
 }
+
+-------------------------------- Structured Logging Correlation --------------------------------
+memberId  007CTE001
+Request body
+{
+  "title": "Rock001234",
+  "category": "Health",
+  "dueDate": "2026-11-07",
+  "note": "Cornelius001"
+}
+Response Body
+{
+  "id": "ac9f6c12-47c2-4e7d-99fb-1ae5bb896d7e",
+  "memberId": "007CTE001",
+  "title": "Rock001234",
+  "category": "Health",
+  "dueDate": "2026-11-07",
+  "note": "Cornelius001",
+  "status": "Pending"
+}
+Response Headers
+ content-type: application/json; charset=utf-8 
+ date: Wed,07 Oct 2026 16:12:56 GMT 
+ location: https://localhost:7076/members/007CTE001/rocks 
+ server: Kestrel 
+ x-correlation-id: 52a450292aa0468b9b6cacd023712abe 
