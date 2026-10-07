@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RockForge.Application\RockForge.Application.csproj" />
+    <ProjectReference Include="..\RockForge.Domain\RockForge.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

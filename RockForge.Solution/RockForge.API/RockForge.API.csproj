@@ -8,10 +8,17 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RockForge.Application\RockForge.Application.csproj" />
+    <ProjectReference Include="..\RockForge.Domain\RockForge.Domain.csproj" />
+    <ProjectReference Include="..\RockForge.Infrastructure\RockForge.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

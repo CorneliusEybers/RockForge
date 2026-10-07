@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="RockForge.API/RockForge.API.csproj" />
+  <Project Path="RockForge.API/RockForge.API.csproj" Id="9f4918fd-f7d5-40bd-a121-5159a34ce5dc" />
   <Project Path="RockForge.Application/RockForge.Application.csproj" />
   <Project Path="RockForge.Domain/RockForge.Domain.csproj" />
   <Project Path="RockForge.Infrastructure/RockForge.Infrastructure.csproj" />
