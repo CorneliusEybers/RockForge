@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using RockForge.Application.Validation;
 using RockForge.Domain;
 using RockForge.Domain.Enums;
+using System.Collections.Concurrent;
 
 namespace RockForge.Application.RockService
 {
@@ -11,6 +12,8 @@ namespace RockForge.Application.RockService
         public Task<Rock> CreateAsync(Rock rock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            RockValidator.ValidateForCreate(rock);
 
             _rocks.TryAdd(rock.Id, rock);
 
