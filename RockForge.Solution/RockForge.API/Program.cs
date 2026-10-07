@@ -1,6 +1,7 @@
 using RockForge.API.ExceptionHandling;
 using RockForge.Application.RockService;
 using System.Text.Json.Serialization;
+using RockForge.Application.Validation.Strategies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +19,16 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Category validation strategies
+builder.Services.AddSingleton<IRockValidationStrategy, RevenueRockValidationStrategy>();
+builder.Services.AddSingleton<IRockValidationStrategy, HealthRockValidationStrategy>();
+builder.Services.AddSingleton<IRockValidationStrategy, CareerRockValidationStrategy>();
+builder.Services.AddSingleton<IRockValidationStrategy, OtherRockValidationStrategy>();
+
 // - Service registrations
 builder.Services.AddSingleton<IRockService, RockService>();
 
+// - Run the Application
 var app = builder.Build();
 
 // - Centralized Exception Handling
