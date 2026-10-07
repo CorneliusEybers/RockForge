@@ -1,0 +1,150 @@
+Test Data:
+==========
+-------------------------------- Create Two Members --------------------------------
+memberId  007CTE001
+Request body
+{
+  "title": "Rock001",
+  "category": "Health",
+  "dueDate": "2026-11-07",
+  "note": "Cornelius001"
+}
+
+memberId  007CTE001
+Request body
+{
+  "title": "Rock002",
+  "category": "Health",
+  "dueDate": "2026-12-07",
+  "note": "Cornelius002"
+}
+
+memberId  007CTE001
+Request body
+{
+  "title": "Rock003",
+  "category": "Health",
+  "dueDate": "2026-10-09",
+  "note": "Cornelius003"
+}
+
+-------------------------------- Create Two Members --------------------------------
+memberId  007CTE002
+Request body
+{
+  "title": "Rock001",
+  "category": "Health",
+  "dueDate": "2026-11-07",
+  "note": "Tobie001"
+}
+Response:
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "memberId": "string",
+  "title": "string",
+  "category": "Revenue",
+  "dueDate": "2026-10-07",
+  "note": "string",
+  "status": "Pending"
+}
+
+memberId  007CTE002
+Request body
+{
+  "title": "Rock002",
+  "category": "Health",
+  "dueDate": "2026-12-07",
+  "note": "Tobie002"
+}
+Response:
+{
+  "id": "025ab42d-e310-4876-a8da-d2a199a5f222",
+  "memberId": "007CTE002",
+  "title": "Rock002",
+  "category": "Health",
+  "dueDate": "2026-12-07",
+  "note": "Tobie002",
+  "status": "Pending"
+}
+memberId  007CTE002
+Request body
+{
+  "title": "Rock003",
+  "category": "Health",
+  "dueDate": "2026-10-09",
+  "note": "Tobie003"
+}
+Response:
+{
+  "id": "d82e734d-1cd6-44a2-b73f-93db8842fcaa",
+  "memberId": "007CTE002",
+  "title": "Rock003",
+  "category": "Health",
+  "dueDate": "2026-10-09",
+  "note": "Tobie003",
+  "status": "Pending"
+}
+
+-------------------------------- Input Validation --------------------------------
+memberId  007CTE001
+Request body
+{
+  "title": "Rock001",
+  "category": "Health",
+  "dueDate": "2026-11-07",
+  "note": "Cornelius001"
+}
+Response:
+{
+  "title": "Validation failed",
+  "status": 400,
+  "detail": "Health Rock title must be at least 10 characters.",
+  "instance": "/members/007CTE001/rocks",
+  "traceId": "0HNP4ETTRIKVI:00000007"
+}
+-------------------------------- Category Validation --------------------------------
+memberId  007CTE001
+Request:
+{
+  "title": "Rock001234",
+  "category": "Revenue",
+  "dueDate": "2027-11-07",
+  "note": "Cornelius001"
+}
+Response:
+{
+  "title": "Validation failed",
+  "status": 400,
+  "detail": "Revenue Rock due date must fall within the current quarter.",
+  "instance": "/members/007CTE001/rocks",
+  "traceId": "0HNP4ETTRIKVI:00000005"
+}
+
+-------------------------------- Global Error Handling --------------------------------
+memberId  007CTE001
+Request:
+{
+  "title": "",
+  "category": "Revenue",
+  "dueDate": "2027-11-07",
+  "note": "Cornelius001"
+}
+Response:
+{
+  "title": "Validation failed",
+  "status": 400,
+  "detail": "Title must not be empty or whitespace.",
+  "instance": "/members/007CTE001/rocks",
+  "traceId": "0HNP4FOAD3IOC:00000011"
+}
+
+Unknown rockId(404)
+memberId  007CTE001
+rockId 3fa85f64-5717-4562-b3fc-2c963f66afa6
+{
+  "title": "Rock not found",
+  "status": 404,
+  "detail": "Rock '3fa85f64-5717-4562-b3fc-2c963f66afa6' was not found for member '007CTE001'.",
+  "instance": "/members/007CTE001/rocks/3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "traceId": "0HNP4FOAD3IOC:00000013"
+}
