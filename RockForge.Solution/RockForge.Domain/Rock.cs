@@ -1,4 +1,5 @@
 ﻿using RockForge.Domain.Enums;
+using RockForge.Domain.Exceptions;
 
 namespace RockForge.Domain
 {
@@ -22,14 +23,14 @@ namespace RockForge.Domain
         {
             if (Status != RockStatus.Pending)
             {
-                throw new InvalidOperationException($"A Rock with status '{Status}' cannot transition to '{status}'.");
+                throw new InvalidRockStateTransitionException($"Rock status cannot transition from '{Status}' to '{status}'.");
             }
 
             if (status != RockStatus.Completed 
                 &&
                 status != RockStatus.Missed)
             {
-                throw new InvalidOperationException($"A Rock can only transition from Pending to Completed or Missed.");
+                throw new InvalidRockStateTransitionException("A pending Rock may only transition to Completed or Missed.");
             }
 
             Status = status;

@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using RockForge.Application.Exceptions;
 using RockForge.Application.Validation;
 using RockForge.Application.Validation.Strategies;
 using RockForge.Domain;
 using RockForge.Domain.Enums;
+using System.Collections.Concurrent;
 
 
 namespace RockForge.Application.RockService
@@ -59,7 +60,7 @@ namespace RockForge.Application.RockService
 
             if (rock == null)
             {
-                throw new KeyNotFoundException($"Rock '{rockId}' was not found for member '{memberId}'.");
+                throw new RockNotFoundException($"Rock '{rockId}' was not found for member '{memberId}'.");
             }
 
             rock.UpdateStatus(status);
